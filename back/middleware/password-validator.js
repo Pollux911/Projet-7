@@ -1,5 +1,4 @@
 const passwordValidator = require('password-validator');
-const jwt = require("jsonwebtoken");
 
 const schema = new passwordValidator();
 

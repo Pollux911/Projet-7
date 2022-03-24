@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const { Sequelize } = require('sequelize');
 
 const express = require('express');
 const helmet = require('helmet');
@@ -27,11 +28,17 @@ app.use(helmet({
 
 app.use('/api', limiter);
 
-/*mongoose.connect(process.env.CONNECT,
-    { useNewUrlParser: true,
-        useUnifiedTopology: true })
-    .then(() => console.log('Connexion à MongoDB réussie !'))
-    .catch(() => console.log('Connexion à MongoDB échouée !'));*/
+const sequelize = new Sequelize('groupomania', process.env.USER, process.env.PASSWORD, {
+    dialect: 'mysql'
+});
+
+try {
+    sequelize.authenticate().then(r => r);
+    console.log('Connection has been established successfully.');
+} catch (error) {
+    console.error('Unable to connect to the database:', error);
+}
+
 
 
 app.use(bodyparser.urlencoded({extended: true}));
@@ -48,7 +55,7 @@ app.use((req, res, next) => {
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-app.use('/api/auth', userRoutes);
-app.use('/api/sauces', sauceRoutes);
+/*app.use('/api/auth', userRoutes);
+app.use('/api/sauces', sauceRoutes);*/
 
 module.exports = app;
