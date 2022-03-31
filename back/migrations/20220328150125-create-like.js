@@ -1,35 +1,30 @@
 'use strict';
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Likes', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER
       },
-      uuid: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4
-      },
-      email: {
+      /*idUSERS: {
         allowNull: false,
-        unique: true,
-        type: DataTypes.STRING
+        type: DataTypes.INTEGER,
+        /!*references: {
+          model: User,
+          key: 'uuid'
+        }*!/
       },
-      firstName: {
+      idPOSTS: {
         allowNull: false,
-        type: DataTypes.STRING
-      },
-      lastName: {
-        allowNull: false,
-        type: DataTypes.STRING
-      },
-      password: {
-        allowNull: false,
-        type: DataTypes.STRING
-      },
-      isAdmin: {
+        type: DataTypes.INTEGER,
+        /!*references: {
+          model: Post,
+          key: 'uuid'
+        }*!/
+      },*/
+      like: {
         allowNull: false,
         type: DataTypes.BOOLEAN,
         defaultValue: 0
@@ -45,6 +40,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Likes');
   }
 };

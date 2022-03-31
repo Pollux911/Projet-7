@@ -9,22 +9,43 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate({ User }) {
       // define association here
-
-      models.Post.belongsTo(models.User, {
-        foreignKey: {
-          allowNull: false
-        }
-      })
+      this.belongsTo(User);
+      this.belongsToMany(User, { through: 'likes' })
+    }
+    toJSON(){
+      return { ...this.get(), id: undefined, userId: undefined }
     }
   }
   Post.init({
-    idPosts: DataTypes.INTEGER,
-    title: DataTypes.STRING,
-    content: DataTypes.STRING,
-    attachement: DataTypes.STRING,
-    likes: DataTypes.INTEGER
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+      type: DataTypes.INTEGER,
+    },
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
+    },
+    title: {
+      allowNull: false,
+      type: DataTypes.STRING
+    },
+    content: {
+      allowNull: false,
+      type: DataTypes.STRING
+    },
+    attachement: {
+      allowNull: true,
+      type: DataTypes.STRING
+    },
+    likes: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    }
   }, {
     sequelize,
     modelName: 'Post',

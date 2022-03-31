@@ -1,17 +1,21 @@
 require('dotenv').config();
 
-const { Sequelize } = require('sequelize');
-
+/*
+const { Sequelize} = require('sequelize');
+*/
+const { sequelize } = require('./models');
 const express = require('express');
 const helmet = require('helmet');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 
 const userRoutes = require('./routes/user');
-const sauceRoutes = require('./routes/sauce');
+const postRoutes = require('./routes/post');
 
 const app = express();
 const bodyparser = require('body-parser');
+
+const bcrypt = require("bcrypt");
 
 const limiter = rateLimit({
         windowMs: 15 * 60 * 1000, // 15 minutes
@@ -20,24 +24,44 @@ const limiter = rateLimit({
         legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
+/*app.listen({port: 5000}, async() => {
+    console.log('CONNECTION REUSSI')
+    await sequelize.sync({ force: true})
+    console.log('DATABASE SYNCHRONISEE')
+});*/
+
+
+
+
+/*const sequelize = new Sequelize('groupomania', process.env.USER, process.env.PASSWORD, {
+    host: 'localhost',
+    dialect: 'mysql'
+});*/
+
+async function connect() {
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
+}
+connect();
+sequelize.sync();
 app.use(helmet({
-            crossOriginResourcePolicy: {policy: "cross-origin"}
+        crossOriginResourcePolicy: {policy: "cross-origin"}
     }
 ));
 
 
 app.use('/api', limiter);
 
-const sequelize = new Sequelize('groupomania', process.env.USER, process.env.PASSWORD, {
-    dialect: 'mysql'
-});
-
-try {
-    sequelize.authenticate().then(r => r);
-    console.log('Connection has been established successfully.');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
+/*async function  connect(){ // destructive sync with { force: true}
+    await sequelize.authenticate();
+    console.log("Database connected");
 }
+connect().then(() => console.log('OKAY'));*/
+
 
 
 
@@ -55,7 +79,19 @@ app.use((req, res, next) => {
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-/*app.use('/api/auth', userRoutes);
-app.use('/api/sauces', sauceRoutes);*/
+app.use('/api/auth', userRoutes);
+app.use('/api/posts', postRoutes);
+
+/*app.post('/users', async(req, res) => {
+    const { email, password, firstName, lastName } = req.body;
+    try {
+        const user = await User.create({ email, password, firstName, lastName});
+        return res.json(user)
+    } catch (err){
+        console.log(err, 'ERREUR');
+        return res.status(500).json(err)
+    }
+})*/
+
 
 module.exports = app;
