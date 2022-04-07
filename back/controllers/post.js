@@ -1,14 +1,18 @@
-const { Post, User} = require("../models");
+const { Post, User, Like, Comment} = require("../models");
 const fs = require('fs');
 
 exports.getAllPosts = (req, res, next) => {
-    Post.findAll({ include: 'user' })
+    Post.findAll({ include: 'user'  })
         .then(posts => res.status(200).json(posts))
         .catch(error => res.status(400).json({ error }));
 };
 
 exports.getOnePost = (req, res, next) => {
-    Post.findOne({ uuid: req.params.uuid})
+    Post.findOne({where: { uuid: req.params.id},
+        include:[
+            'user', 'postLike'
+        ]
+        })
         .then(post => res.status(200).json(post))
         .catch(error => res.status(404).json({ error }));
 };
@@ -20,12 +24,12 @@ exports.createPost = (req, res, next) => {
     User.findOne({where: { uuid: userUuid }})
         .then((user) => {
             if (!user) {
-                console.log(' user 404 404')
                 return res.status(404).json({
                     error: 'Utilisateur non trouvée !'
                 })
             }
-            /*if (user.id !== req.auth.id) { //check auth
+            console.log(user.id, 'ztdf')
+            /*if (user.id !== req.auth.id) { //check auth token
                  return res.status(401).json({
                     error: 'Requête non autorisée !'
             })
@@ -99,6 +103,54 @@ exports.deletePost = (req, res, next) => {
         })
         .catch( error => res.status(500).json({ error }))
 };*/
+
+
+exports.likePost = (req, res, next) => {
+    const likeBody = req.body;
+    Post.findOne( {where: {uuid: req.params.id}})
+        .then((post) => {
+
+            if(!post) {
+                return res.status(404).json({
+                    error: 'Post non trouvée !'
+                })
+            }
+            console.log(req.body.like, 'le like')
+            console.log(req.body, 'le body')
+            if(req.body.like == 1){
+
+                console.log('asdfasdf')
+                Like.create({
+                    ...likeBody,
+                    like: 1,
+                    userId: req.body.userId,
+                    postId: req.body.postId
+                })
+                    .then(() =>  res.status(200).json({message: 'Like ajouté' }))
+                    .catch((error) => res.status(400).json({ error }))
+
+            }
+
+            /*else if(req.body.like === 0 /!*&&
+                Like.findOne(
+                    {where: {
+                            userId: req.body.userId,
+                            postId: req.params.id
+                        }})*!/
+            ){
+                Like.destroy({
+                    where: {
+                        userId: req.body.userId,
+                        postId: req.params.id
+                    }})
+                    .then( () =>  res.status(200).json({ message: 'like retiré'}))
+                    .catch((error) => res.status(400).json({ error }))
+            }*/
+
+        })
+        .catch((error) => res.status(400).json({ error }))
+}
+
 
 /*exports.likePost = (req, res, next) => {
     Post.findOne({_id: req.params.id})

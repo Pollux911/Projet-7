@@ -10,8 +10,8 @@ exports.signup = (req, res, next) => {
                 return res.status(401).json({ error: 'Email déjà utilisé !' });
             }
             bcrypt.hash(req.body.password, 10)
-                .then(hash =>
-            {User.create({
+                .then(hash => {
+                    User.create({
                         email: req.body.email,
                         firstName: req.body.firstName,
                         lastName: req.body.lastName,
@@ -49,3 +49,17 @@ exports.login = (req, res, next) => {
         .catch(error => res.status(500).json({ error }));
 
 };
+
+exports.deleteUser = (req, res, next) => {
+    User.findOne({where: {email: req.body.email}})
+        .then( user => {
+            if(!user) {
+                return res.status(404).json({
+                    error: 'Post non trouvée !'
+                })
+            }
+            User.destroy({where: { email: req.body.email }})
+                .then(() => res.status(200).json({ message: 'Post supprimée !' }))
+                .catch(error => res.status(400).json({ error }));
+        })
+}

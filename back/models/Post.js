@@ -11,8 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ User }) {
       // define association here
-      this.belongsTo(User);
-      this.belongsToMany(User, { through: 'likes' })
+      this.belongsTo(User, {
+        foreignKey: 'userId', as: 'user'
+      });
+      this.belongsToMany(User, { as: 'commentpost', through: 'comments' /*sourceKey: 'uuid', targetKey: 'uuid',*/});
+      this.belongsToMany(User, { through: 'likes',/* sourceKey: 'uuid', targetKey: 'uuid',*/  as: 'postLike'})
     }
     toJSON(){
       return { ...this.get(), id: undefined, userId: undefined }
@@ -27,7 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     uuid: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+      defaultValue: DataTypes.UUIDV4,
+      unique: true
     },
     title: {
       allowNull: false,

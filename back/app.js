@@ -11,6 +11,8 @@ const rateLimit = require('express-rate-limit');
 
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
+
 
 const app = express();
 const bodyparser = require('body-parser');
@@ -47,11 +49,13 @@ async function connect() {
     }
 }
 connect();
-sequelize.sync();
+//sequelize.sync({force: true}); // destructive sync
+
 app.use(helmet({
         crossOriginResourcePolicy: {policy: "cross-origin"}
     }
 ));
+
 
 
 app.use('/api', limiter);
@@ -81,11 +85,13 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/auth', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
-/*app.post('/users', async(req, res) => {
-    const { email, password, firstName, lastName } = req.body;
+
+/*app.post('/api/posts/', async(req, res) => {
+    const likeBody = req.body;
     try {
-        const user = await User.create({ email, password, firstName, lastName});
+        const user = await Like.create({ ...likeBody});
         return res.json(user)
     } catch (err){
         console.log(err, 'ERREUR');
