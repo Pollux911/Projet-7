@@ -2,27 +2,27 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Likes', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
       userId: {
         allowNull: false,
         type: Sequelize.UUID,
+        primaryKey: true,
         references: {
           model: 'Users',
-          key: 'uuid',
-        }
+          key: 'id',
+        },
+        onUpdate: 'cascade',
+        onDelete: 'cascade'
       },
       postId: {
         allowNull: false,
         type: Sequelize.UUID,
+        primaryKey: true,
         references: {
           model: 'Posts',
-          key: 'uuid',
+          key: 'id',
         },
+        onUpdate: 'cascade',
+        onDelete: 'cascade'
       },
       like: {
         allowNull: false,
@@ -37,9 +37,44 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    })
+    /*await queryInterface.addColumn(
+        'users', // name of Source model
+        'userId', // name of the key we're adding
+        {
+          type: Sequelize.UUID,
+          references: {
+            model: 'users', // name of Target model
+            key: 'uuid', // key in Target model that we're referencing
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+    );
+    await queryInterface.addColumn(
+        'posts', // name of Source model
+        'postId', // name of the key we're adding
+        {
+          type: Sequelize.UUID,
+          references: {
+            model: 'posts', // name of Target model
+            key: 'uuid', // key in Target model that we're referencing
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+    );*/
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Likes');
+    /*await queryInterface.removeColumn(
+        'Users', // name of Source model
+        'userId' // key we want to remove
+    );
+    await queryInterface.removeColumn(
+        'Posts', // name of Source model
+        'postId' // key we want to remove
+    );*/
   }
+
 };

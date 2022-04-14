@@ -11,21 +11,27 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Comment.belongsTo(models.User, {
+        foreignKey: 'userId'
+      });
+      Comment.belongsTo(models.Post, {
+        foreignKey: 'postId'
+      });
     }
   }
   Comment.init({
     id: {
-      allowNull: false,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      type: DataTypes.INTEGER
+      allowNull: false
     },
     userId: {
       allowNull: false,
       type: DataTypes.UUID,
       references: {
         model: 'Users',
-        key: 'uuid',
+        key: 'id',
       }
     },
     postId: {
@@ -33,12 +39,20 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       references: {
         model: 'Posts',
-        key: 'uuid',
+        key: 'id',
       },
     },
     content: {
       allowNull: false,
       type: DataTypes.STRING
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
     }
   }, {
     sequelize,

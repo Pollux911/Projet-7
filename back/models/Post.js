@@ -9,29 +9,38 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ User }) {
+    static associate(models) {
       // define association here
-      this.belongsTo(User, {
-        foreignKey: 'userId', as: 'user'
+      //Post.belongsToMany(User, { /*as: 'postlike',*/ through:  'UserPost', sourceKey: User.uuid, targetKey: Post.uuid})
+      Post.belongsTo(models.User, {
+        foreignKey: 'userId', as: 'users'
+      })
+      Post.belongsToMany(models.User, {
+        as: 'postLike',
+        through: models.Like,
+        /*sourceKey: 'id', targetKey: 'id'*/
       });
-      this.belongsToMany(User, { as: 'commentpost', through: 'comments' /*sourceKey: 'uuid', targetKey: 'uuid',*/});
-      this.belongsToMany(User, { through: 'likes',/* sourceKey: 'uuid', targetKey: 'uuid',*/  as: 'postLike'})
+      Post.belongsToMany(models.User, {
+        as: 'postComment',
+        through: models.Comment,
+        /*sourceKey: 'id', targetKey: 'id'*/
+      });
+
     }
-    toJSON(){
-      return { ...this.get(), id: undefined, userId: undefined }
-    }
+    /*toJSON(){
+      return { ...this.get() }
+    }*/
   }
+  /*Post.associate = function (models) {
+
+
+  };*/
   Post.init({
     id: {
-      autoIncrement: true,
-      primaryKey: true,
-      allowNull: false,
-      type: DataTypes.INTEGER,
-    },
-    uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      unique: true
+      primaryKey: true,
+      allowNull: false
     },
     title: {
       allowNull: false,
@@ -49,6 +58,22 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.INTEGER,
       defaultValue: 0
+    },
+    userId: {
+      allowNull: false,
+      type: DataTypes.UUID,
+      references: {
+        model: 'Users',
+        key: 'id',
+      },
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
     }
   }, {
     sequelize,

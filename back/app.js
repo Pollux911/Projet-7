@@ -3,7 +3,7 @@ require('dotenv').config();
 /*
 const { Sequelize} = require('sequelize');
 */
-const { sequelize } = require('./models');
+const { sequelize, Post, User, Like} = require('./models');
 const express = require('express');
 const helmet = require('helmet');
 const path = require('path');
@@ -26,14 +26,6 @@ const limiter = rateLimit({
         legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-/*app.listen({port: 5000}, async() => {
-    console.log('CONNECTION REUSSI')
-    await sequelize.sync({ force: true})
-    console.log('DATABASE SYNCHRONISEE')
-});*/
-
-
-
 
 /*const sequelize = new Sequelize('groupomania', process.env.USER, process.env.PASSWORD, {
     host: 'localhost',
@@ -49,7 +41,7 @@ async function connect() {
     }
 }
 connect();
-//sequelize.sync({force: true}); // destructive sync
+//sequelize.sync({}); // destructive sync
 
 app.use(helmet({
         crossOriginResourcePolicy: {policy: "cross-origin"}
@@ -60,11 +52,7 @@ app.use(helmet({
 
 app.use('/api', limiter);
 
-/*async function  connect(){ // destructive sync with { force: true}
-    await sequelize.authenticate();
-    console.log("Database connected");
-}
-connect().then(() => console.log('OKAY'));*/
+
 
 
 

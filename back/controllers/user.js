@@ -55,9 +55,13 @@ exports.deleteUser = (req, res, next) => {
         .then( user => {
             if(!user) {
                 return res.status(404).json({
-                    error: 'Post non trouvée !'
+                    error: 'Utilisateur non trouvée !'
                 })
             }
+            /*if (user.uuid !== req.auth.userId || ) { // check auth or user is an Admin
+                return res.status(401).json({
+                    error: 'Requête non autorisée !'})
+            }*/
             User.destroy({where: { email: req.body.email }})
                 .then(() => res.status(200).json({ message: 'Post supprimée !' }))
                 .catch(error => res.status(400).json({ error }));

@@ -1,27 +1,57 @@
-const { Post, User, Like, Comment} = require("../models");
+const {User, Post, Like, Comment} = require("../models");
 const fs = require('fs');
 
+/*Post.findAll({ // multiple include
+    include: [
+        {
+            model : Comment,
+            as: 'comments',
+            include : [ "user"]
+        },
+        "user"
+    ]
+})*/
+
+
 exports.getAllPosts = (req, res, next) => {
-    Post.findAll({ include: 'user'  })
+    Post.findAll({
+        include: {
+            model: User,
+            as: 'postLike',
+            attributes: ['firstName', 'lastName'],
+            through: {
+                attributes: ['like']
+            }}
+    })
         .then(posts => res.status(200).json(posts))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => {
+            console.log(error)
+            res.status(400).json({ error });
+        })
 };
 
 exports.getOnePost = (req, res, next) => {
-    Post.findOne({where: { uuid: req.params.id},
-        include:[
-            'user', 'postLike'
-        ]
-        })
+    Post.findOne({where: { id: req.params.id},
+        include: {
+        model: User,
+        as:'postLike',
+        attributes: ['firstName', 'lastName'],
+        through: {
+            attributes: ['like']
+        }}
+    })
         .then(post => res.status(200).json(post))
-        .catch(error => res.status(404).json({ error }));
+        .catch(error => {
+            console.log(error)
+            res.status(404).json({ error });
+        })
 };
 
 
 exports.createPost = (req, res, next) => {
-    const { userUuid, ...postBody } = req.body;
+    const { userId, ...postBody } = req.body;
 
-    User.findOne({where: { uuid: userUuid }})
+    User.findOne({where: { id: userId }})
         .then((user) => {
             if (!user) {
                 return res.status(404).json({
@@ -49,6 +79,7 @@ exports.createPost = (req, res, next) => {
 
 
 exports.modifyPost = (req, res, next) => {
+
     const postObject = req.file ?
         {
             ...JSON.parse(req.body.post),
@@ -60,14 +91,18 @@ exports.modifyPost = (req, res, next) => {
 };
 
 exports.deletePost = (req, res, next) => {
-    Post.findOne( {where: { uuid: req.params.id}})
+    Post.findOne( {where: { id: req.params.id}})
         .then((post) => {
-                if(!post) {
-                    return res.status(404).json({
-                        error: 'Post non trouvée !'
-                    })
-                }
-            Post.destroy({where: { uuid: req.params.id }})
+            if(!post) {
+                return res.status(404).json({
+                    error: 'Post non trouvée !'
+                })
+            }
+            /*if (post.userId !== req.auth.userId ||  ) { // check auth of user
+            return res.status(401).json({
+                error: 'Requête non autorisée !'})
+            }*/
+            Post.destroy({where: { id: req.params.id }})
                 .then(() => res.status(200).json({ message: 'Post supprimée !' }))
                 .catch(error => res.status(400).json({ error }));
         })
@@ -107,80 +142,45 @@ exports.deletePost = (req, res, next) => {
 
 exports.likePost = (req, res, next) => {
     const likeBody = req.body;
-    Post.findOne( {where: {uuid: req.params.id}})
+    Post.findOne( {where: {id: req.params.id}})
         .then((post) => {
-
             if(!post) {
                 return res.status(404).json({
                     error: 'Post non trouvée !'
                 })
             }
-            console.log(req.body.like, 'le like')
-            console.log(req.body, 'le body')
-            if(req.body.like == 1){
-
-                console.log('asdfasdf')
-                Like.create({
-                    ...likeBody,
-                    like: 1,
-                    userId: req.body.userId,
-                    postId: req.body.postId
-                })
-                    .then(() =>  res.status(200).json({message: 'Like ajouté' }))
-                    .catch((error) => res.status(400).json({ error }))
-
-            }
-
-            /*else if(req.body.like === 0 /!*&&
-                Like.findOne(
-                    {where: {
+            Like.findOne({where: {userId: req.body.userId, postId: req.params.id, like: true}})
+                .then((like) => {
+                    if(like && req.body.like === false) {
+                        Like.destroy({where: { userId: req.body.userId, postId: req.params.id, like: true}})
+                            .then(() => res.status(200).json({ message: 'Like Supprimé !' }))
+                            .catch(error => res.status(400).json({ error }))
+                    }
+                    else if(!like && req.body.like === true) {
+                        Like.create({
+                            like: true,
                             userId: req.body.userId,
                             postId: req.params.id
-                        }})*!/
-            ){
-                Like.destroy({
-                    where: {
-                        userId: req.body.userId,
-                        postId: req.params.id
-                    }})
-                    .then( () =>  res.status(200).json({ message: 'like retiré'}))
-                    .catch((error) => res.status(400).json({ error }))
-            }*/
-
+                        })
+                            .then(() =>  res.status(200).json({message: 'Like ajouté' }))
+                            .catch((error) => {
+                                res.status(400).json({ error })
+                            })
+                    }
+                    else if(like && req.body.like === true){
+                        res.status(400).json({ error: 'Post déjà liké !'})
+                    }
+                    else{
+                        res.status(404).json({ error: 'Like inexistant !'})
+                    }
+                })
+                .catch(error => res.status(405).json({ error }))
         })
-        .catch((error) => res.status(400).json({ error }))
+        .catch((error) => {
+            console.log(error)
+            res.status(400).json({ error:'Requête invalide' })
+        })
 }
 
 
-/*exports.likePost = (req, res, next) => {
-    Post.findOne({_id: req.params.id})
-        .then((sauce) => {
-            if(req.body.like === 1 && !sauce.usersLiked.includes(req.body.userId) && !sauce.usersDisliked.includes(req.body.userId)){
-                Post.updateOne({_id: req.params.id }, {$inc: { likes: 1 }, $push: { usersLiked: req.body.userId }})
-                    .then(() => res.status(200).json({ message: 'Like modifié !'}))
-                    .catch(error => res.status(400).json({ error }));
-            }
-            else if (req.body.like === -1 && !sauce.usersLiked.includes(req.body.userId) && !sauce.usersDisliked.includes(req.body.userId)){
-                Post.updateOne({_id: req.params.id }, {$inc: { dislikes: 1 }, $push: { usersDisliked: req.body.userId }})
-                    .then(() => res.status(200).json({ message: 'Dislike modifié !'}))
-                    .catch(error => res.status(400).json({ error }))
-            }
-            else if(req.body.like === 0 && sauce.usersLiked.includes(req.body.userId) && !sauce.usersDisliked.includes(req.body.userId)){
-                Post.updateOne({_id: req.params.id}, {$inc: {likes: -1}, $pull: { usersLiked: req.body.userId } })
-                    .then(() => res.status(200).json({ message: 'Like retiré !'}))
-                    .catch(error => res.status(400).json({ error }));
-            }
-            else if(req.body.like === 0 && !sauce.usersLiked.includes(req.body.userId) && sauce.usersDisliked.includes(req.body.userId)){
-                Post.updateOne({_id: req.params.id}, {$inc: {dislikes: -1}, $pull: { usersDisliked: req.body.userId } })
-                    .then(() => res.status(200).json({ message: 'Dislike retiré !'}))
-                    .catch(error => res.status(400).json({ error }));
-            }
-            else {
-                console.log(req.body, 'la req')
-                console.log(!sauce.usersLiked.includes(req.body.userId), 'allo');
-                console.log(!sauce.usersDisliked.includes(req.body.userId), 'allui');
-                return res.status(400).json({ error: 'Vous ne pouvez pas liker ou disliker plusieurs fois une sauce' })
-            }
-        })
-        .catch(error => res.status(404).json({ error }))
-}*/
+

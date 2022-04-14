@@ -9,30 +9,34 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Post}) {
+    static associate(models) {
       // define association here
-      this.hasMany(Post, {
-        foreignKey: 'userId', as: 'user'
+      //User.belongsToMany(Post, { /*as: 'userlike',*/ through: 'UserPost', sourceKey: User.uuid, targetKey: Post.uuid })
+      User.hasMany(models.Post, {
+        foreignKey: 'userId', as: 'posts'
       });
-      this.belongsToMany(Post, { /*sourceKey: 'uuid', targetKey: 'uuid',*/ as: 'commentuser', through: 'comments'});
-      this.belongsToMany(Post, {  through: 'likes', /*sourceKey: 'uuid', targetKey: 'uuid',*/ as: 'userLike' })
+      User.belongsToMany(models.Post, {
+        as:'userLike',
+        through: models.Like,
+        sourceKey: 'id', targetKey: 'id'
+      });
+      User.belongsToMany(models.Post, {
+        as:'userComment',
+        through: models.Comment,
+        sourceKey: 'id', targetKey: 'id'
+      });
 
     }
     toJSON() {
-      return { ...this.get(), id: undefined, email: undefined, password: undefined, isAdmin: undefined }
+      return { ...this.get(), email: undefined, password: undefined, isAdmin: undefined }
     }
   }
   User.init({
     id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER
-    },
-    uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      unique: true,
+      primaryKey: true,
+      allowNull: false
     },
     email: {
       allowNull: false,
