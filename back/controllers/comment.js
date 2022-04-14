@@ -8,7 +8,7 @@ exports.getAllComments = (req, res, next) => {
 };
 
 exports.getOneComment = (req, res, next) => {
-    Post.findOne({where: { uuid: req.params.id}/*, include: 'user'*/})
+    Comment.findOne({where: { id: req.params.id}/*, include: 'user'*/})
         .then(post => res.status(200).json(post))
         .catch(error => res.status(404).json({ error }));
 };
@@ -16,10 +16,10 @@ exports.getOneComment = (req, res, next) => {
 exports.createComment = (req, res, next) => {
     const commentBody = req.body;
     Comment.create({
-        ...commentBody
-        /*userId: commentBody.userId,
-        postId: commentBody.postId,
-        content: commentBody.content*/
+        /*...commentBody,*/
+        userId: commentBody.userId,
+        postId: req.params.id,
+        content: commentBody.content
     })
         .then( () => res.status(201).json({ message: 'Commentaire créé !'}))
         .catch(error => res.status(400).json({ error }));

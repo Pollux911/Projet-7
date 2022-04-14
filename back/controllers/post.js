@@ -15,13 +15,25 @@ const fs = require('fs');
 
 exports.getAllPosts = (req, res, next) => {
     Post.findAll({
-        include: {
-            model: User,
+        include: [
+
+            {model: User,
             as: 'postLike',
             attributes: ['firstName', 'lastName'],
             through: {
                 attributes: ['like']
-            }}
+            },
+            },
+            {
+                model:User,
+                as:'postComment',
+                attributes:['firstName', 'lastName',],
+                through: {
+                    attributes: ['content']
+                },
+            }
+        ]
+
     })
         .then(posts => res.status(200).json(posts))
         .catch(error => {
