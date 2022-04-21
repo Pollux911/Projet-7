@@ -17,10 +17,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.UUID,
         primaryKey: true,
-        references: {
-          model: 'Posts',
+        /*references: {
+          model: 'Comments',
           key: 'id',
-        },
+        },*/
         onUpdate: 'cascade',
         onDelete: 'cascade'
       },

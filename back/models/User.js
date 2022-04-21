@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
         through: models.Comment,
         sourceKey: 'id', targetKey: 'id'
       });
+      User.belongsToMany(models.Comment, {
+        as:'userLikeComment',
+        through: models.Like,
+        sourceKey: 'id', foreignKey: 'postId'
+      });
 
     }
     toJSON() {

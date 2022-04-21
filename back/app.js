@@ -75,17 +75,4 @@ app.use('/api/auth', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 
-
-/*app.post('/api/posts/', async(req, res) => {
-    const likeBody = req.body;
-    try {
-        const user = await Like.create({ ...likeBody});
-        return res.json(user)
-    } catch (err){
-        console.log(err, 'ERREUR');
-        return res.status(500).json(err)
-    }
-})*/
-
-
 module.exports = app;

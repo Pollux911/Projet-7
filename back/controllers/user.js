@@ -58,7 +58,7 @@ exports.deleteUser = (req, res, next) => {
                     error: 'Utilisateur non trouvée !'
                 })
             }
-            /*if (user.uuid !== req.auth.userId || ) { // check auth or user is an Admin
+            /*if (user.uuid !== req.auth.userId || req.auth.admin === true) { // check auth or user is an Admin
                 return res.status(401).json({
                     error: 'Requête non autorisée !'})
             }*/
@@ -66,4 +66,5 @@ exports.deleteUser = (req, res, next) => {
                 .then(() => res.status(200).json({ message: 'Post supprimée !' }))
                 .catch(error => res.status(400).json({ error }));
         })
+        .catch(error => res.status(500).json({ error }))
 }

@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
        Like.belongsTo(models.Post, {
          foreignKey: 'postId', as: 'likePost'
        });
+       Like.belongsTo(models.Comment, {
+         foreignKey: 'postId', as: 'likeComment'
+       })
     }
   }
   Like.init({
@@ -35,10 +38,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.UUID,
       primaryKey: true,
-      references: {
+      /*references: {
         model: 'Posts',
         key: 'id',
-      },
+      },*/
       onUpdate: 'cascade',
       onDelete: 'cascade'
     },

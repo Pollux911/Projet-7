@@ -12,10 +12,16 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Comment.belongsTo(models.User, {
-        foreignKey: 'userId'
+        foreignKey: 'userId', as: 'commentUser'
       });
       Comment.belongsTo(models.Post, {
+        foreignKey: 'postId', as: 'commentPost'
+      });
+      Comment.belongsToMany(models.User, {
+        as: 'commentLike',
+        through: models.Like,
         foreignKey: 'postId'
+        //sourceKey: 'id', targetKey: 'id'
       });
     }
   }
@@ -45,6 +51,11 @@ module.exports = (sequelize, DataTypes) => {
     content: {
       allowNull: false,
       type: DataTypes.STRING
+    },
+    likes: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     },
     createdAt: {
       allowNull: false,

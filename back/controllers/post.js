@@ -152,7 +152,7 @@ exports.deletePost = (req, res, next) => {
 };*/
 
 
-exports.likePost = (req, res, next) => {
+/*exports.likePost = async (req, res, next) => {
     const likeBody = req.body;
     Post.findOne( {where: {id: req.params.id}})
         .then((post) => {
@@ -175,9 +175,10 @@ exports.likePost = (req, res, next) => {
                             postId: req.params.id
                         })
                             .then(() =>  res.status(200).json({message: 'Like ajouté' }))
-                            .catch((error) => {
-                                res.status(400).json({ error })
-                            })
+                            .catch((error) => {res.status(400).json({ error })})
+                        Post.increment({ likes: 1 }, {where: { uuid: req.params.id}})
+                            .then(() =>  res.status(200).json({message: 'Like incrémenté' }))
+                            .catch((error) => {res.status(400).json({ error })})
                     }
                     else if(like && req.body.like === true){
                         res.status(400).json({ error: 'Post déjà liké !'})
@@ -186,13 +187,77 @@ exports.likePost = (req, res, next) => {
                         res.status(404).json({ error: 'Like inexistant !'})
                     }
                 })
-                .catch(error => res.status(405).json({ error }))
+                .catch(error => res.status(400).json({ error }))
         })
         .catch((error) => {
             console.log(error)
             res.status(400).json({ error:'Requête invalide' })
         })
+}*/
+
+exports.likePost = async (req, res, next) => { // Check if post exists than check like state before adding or deleting like from database
+
+    try{
+        const findPost = await Post.findOne({where: {id: req.params.id}});
+        if(!findPost){ return res.status(404).json({ error: "Post inexistant !"}) }
+
+        const likePost = await Like.findOne // Find Like in database
+            ({where: {
+                userId: req.body.userId,
+                postId: req.params.id,
+                like: true}})
+        /*.catch(error => {
+               console.log(error)
+               res.status(400).json({ error })
+           })*/
+
+        if (likePost && req.body.like === false){ // if like exists in database and like request is false, delete it from db
+            await deleteLike(req, res)
+                .then(() =>  res.status(200).json({message: 'Like supprimé !' }))
+        }
+        else if(likePost && req.body.like === true){// if like exists in database and like request is true, nothing is added to db
+            return res.status(400).json({ error: 'Post déjà liké !'})
+        }
+        else if(!likePost && req.body.like === true) {// if like doesn't exist in database and like request is true, like is added to db
+            await createLike(req, res)
+                .then(() =>  res.status(200).json({message: 'Like ajouté' }))
+        }
+        else{
+            return res.status(404).json({ error: 'Like inexistant !'})
+        }
+    }catch (error){
+        console.log(error)
+        return res.status(404).json({error: 'Requête invalide !'})
+    }
 }
 
+async function deleteLike(req, res) { // Delete like from database
+    try {
+        const destroyLike = await Like.destroy({where: // Delete like from likes table in db
+                {   userId: req.body.userId,
+                    postId: req.params.id,
+                    like: true}})
+        const decrementLike = await Post.increment({ likes: -1 }, {where: { id: req.params.id}}) // Decrement likes by 1 in Post likes counter
+        return destroyLike + decrementLike
+    } catch (error){
+        console.log(error)
+        return res.status(400).json({ error })
+    }
 
+}
 
+async function createLike(req, res) { // Create like from database
+    try{
+        const createLikeData = await Like.create({ // Create like in likes table in db
+            like: true,
+            userId: req.body.userId,
+            postId: req.params.id
+        })
+        const incrementLike = Post.increment({ likes: 1 }, {where: { id: req.params.id}}) // Increment likes by 1 in Post likes counter
+        return createLikeData + incrementLike
+
+    }catch (error){
+        console.log(error)
+        return res.status(400).json({ error })
+    }
+}
