@@ -16,13 +16,19 @@ const fs = require('fs');
 exports.getAllPosts = (req, res, next) => {
     Post.findAll({
         include: [
-
-            {model: User,
-            as: 'postLike',
-            attributes: ['firstName', 'lastName'],
-            through: {
-                attributes: ['like']
+            {
+                model: User,
+                as: 'users',
+                attributes: ['firstName', 'lastName']
             },
+
+            {
+                model: User,
+                as: 'postLike',
+                attributes: ['firstName', 'lastName'],
+                through: {
+                    attributes: ['like']
+                },
             },
             {
                 model:User,

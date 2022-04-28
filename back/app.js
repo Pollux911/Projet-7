@@ -41,7 +41,6 @@ async function connect() {
     }
 }
 connect();
-//sequelize.sync({}); // destructive sync
 
 app.use(helmet({
         crossOriginResourcePolicy: {policy: "cross-origin"}
@@ -50,7 +49,7 @@ app.use(helmet({
 
 
 
-app.use('/api', limiter);
+//app.use('/api', limiter);
 
 
 

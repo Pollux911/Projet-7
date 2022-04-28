@@ -10,9 +10,6 @@ export default {
 </script>
 
 <style>
-.grpLogo{
-  width: 25%;
-}
 a {
   text-decoration: none;
 }

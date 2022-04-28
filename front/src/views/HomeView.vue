@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <img class="grpLogo" alt="Groupomania logo" src="../assets/icon-left-font.png">
+<!--    <img class="grpLogo" alt="Groupomania logo" src="../assets/icon-left-font.png">-->
     <HelloWorld msg="Bienvenue sur Groupomania"/>
     <LogIn />
   </div>
@@ -20,8 +20,6 @@ export default {
 }
 </script>
 
-<style scoped>
-.grpLogo{
-  width: 10%;
-}
+<style lang="scss">
+
 </style>

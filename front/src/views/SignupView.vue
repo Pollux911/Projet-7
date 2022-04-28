@@ -1,16 +1,19 @@
 <template>
   <div>
-    <HelloWorld msg="Accueil Forum"/>
+    <HelloWorld msg="Inscription"/>
+    <SignUp></SignUp>
   </div>
 </template>
 
 <script>
 import HelloWorld from "@/components/HelloWorld";
+import SignUp from "@/components/SignUp";
 
 export default {
-  name: "ForumView",
+  name: "SignupView",
   components: {
-    HelloWorld
+    SignUp,
+    HelloWorld,
   }
 }
 </script>
