@@ -1,11 +1,11 @@
 <template>
   <div>
     <HelloWorld msg="Inscription"/>
-    <SignUp></SignUp>
+    <SignUp/>
   </div>
 </template>
 
-<script>
+<script >
 import HelloWorld from "@/components/HelloWorld";
 import SignUp from "@/components/SignUp";
 
@@ -16,8 +16,8 @@ export default {
     HelloWorld,
   }
 }
-</script>
+</script >
 
-<style scoped>
+<style lang="scss">
 
 </style>

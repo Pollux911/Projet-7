@@ -1,8 +1,5 @@
 <template>
-  <form @submit="checkForm"
-
-        method="post"
-        novalidate="true">
+  <Form @submit="handleSignup">
       <div v-if="errors.length">
         <b>Veuillez corriger les erreurs suivantes:</b>
       <ul>
@@ -11,109 +8,134 @@
     <div class="signup">
       <div class="signup__email">
         <label for="email">Email : </label>
-        <input type="email" name="email" id="email" v-model="email" placeholder="email@example.com">
+        <Field type="email" name="email" id="email" v-model="email" :rules="validateEmail"  placeholder="email@example.com" />
+        <ErrorMessage name="email" />
       </div>
       <div class="signup__password">
         <label for="password">Mot de passe : </label>
-        <input type="password" name="password" id="password" v-model="password" placeholder="MotDePasse123@" required>
+        <Field type="password" name="password" id="password" v-model="password" :rules="validatePassword" placeholder="MotDePasse123@" required />
+        <ErrorMessage name="password" />
       </div>
       <div class="signup__lastName">
         <label for="text">Nom : </label>
-        <input type="text" name="lastName" id="lastName" v-model="lastName" placeholder="Nom" required>
+        <Field type="text" name="lastName" id="lastName" v-model="lastName" :rules="validateLastName" placeholder="Nom" required />
+        <ErrorMessage name="lastName" />
       </div>
       <div class="signup__firstName">
         <label for="text">Prénom : </label>
-        <input type="text" name="firstName" id="firstName" v-model="firstName" placeholder="Prénom" required>
+        <Field type="text" name="firstName" id="firstName" v-model="firstName" :rules="validateFirstName" placeholder="Prénom" required />
+        <ErrorMessage name="firstName" />
       </div>
       <div class="form__submit">
-        <input type="submit" value="S'inscrire" id="submit">
+        <input type="submit" value="S'inscrire" id="submit" />
       </div>
     </div>
-  </form>
+  </Form>
+  <div v-if="message" class="alert" :class="successful ? 'alert-success' : 'alert-danger'">{{ message.error || message }}</div>
 </template>
 
 <script>
+import { Form, Field, ErrorMessage } from 'vee-validate';
+
 export default {
   name: "SignUp",
+  components: {
+    Form,
+    Field,
+    ErrorMessage
+  },
   data() {
     return {
       errors: [],
       email: null,
       password: null,
       firstName: null,
-      lastName: null
+      lastName: null,
+      user: {},
+      submitted: false,
+      successful: false,
+      message: ''
+    }
+  },
+  computed: {
+    loggedIn() {
+      return this.$store.state.auth.status.loggedIn;
+    }
+  },
+  mounted() {
+    if (this.loggedIn) {
+      this.$router.push('/forum');
     }
   },
   methods: {
-    connect(email, password, firstName, lastName){
-      let info = {
-        email: email.value,
-        password: password.value,
-        firstName: firstName.value,
-        lastName: lastName.value,
-
+    handleSignup() {
+      this.message = '';
+      this.submitted = true;
+      this.user = {
+        email: this.email,
+        password: this.password,
+        firstName: this.firstName,
+        lastName: this.lastName
       }
-      fetch("http://localhost:3000/api/signup", {
-        method: "POST",
-        body: JSON.stringify(info),
-        headers: {
-          "content-type" : "application/json",
-        }
-      })
-          .then(function (res){
-            if(res.ok) {
-              return res.json();
-            } else {
-              console.log("error with API", res)
-            }
-          })
-          .then(function (){
-            window.location = `./forum`;
-
-          })
+      this.$store.dispatch('auth/signup', this.user).then(
+          data => {
+            this.message = data.message;
+            this.successful = true;
+            setTimeout( () => this.$router.push('/forum'), 3000)
+          },
+          error => {
+            this.message =
+                (error.response && error.response.data) ||
+                error.message ||
+                error.toString();
+            this.successful = false;
+          }
+      );
     },
 
-    checkForm(e){
+    validateEmail(value) {
+      if (!value) {
+        return 'Email requis !'
+      }
+
       const regExpEmail = new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
-      const regExpName = new RegExp('^[a-zA-Z-áàâäãåçéèêëíìîïñóòôöõú ùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ-]*$');
-
-      this.errors = [];
-
-      if(!this.email) {
-        this.errors.push({message: 'Email requis'})
+      if (!regExpEmail.test(value)) {
+        return 'Email incorrect !'
       }
 
-      if(!regExpEmail.test(this.email)){
-        this.errors.push({message: 'Email invalide'})
-      }
-
-      if(!this.password) {
-        this.errors.push({message: 'Mot de passe requis'})
-      }
-
-      if(!this.lastName) {
-        this.errors.push({message: 'Nom requis'})
-      }
-
-      if(!regExpName.test(this.lastName)){
-        this.errors.push({message: 'Prénom invalide'})
-      }
-
-      if(!this.firstName) {
-        this.errors.push({message: 'Prénom requis'})
-      }
-
-      if(!regExpName.test(this.firstName)){
-        this.errors.push({message: 'Nom invalide'})
-      }
-      else {
-        this.connect(this.email, this.password, this.firstName, this.lastName)
-      }
-
-      e.preventDefault()
+      return true;
     },
 
+    validatePassword(value) {
+      if(!value){
+        return 'Mot de passe requis !'
+      }
 
+      return true;
+    },
+
+    validateFirstName(value) {
+      if(!value){
+        return 'Prénom requis !'
+      }
+      const regExpName = new RegExp('^[a-zA-Z-áàâäãåçéèêëíìîïñóòôöõú ùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ-]*$');
+      if(!regExpName.test(value)) {
+        return 'Prénom invalide'
+      }
+
+      return true;
+    },
+    validateLastName(value) {
+      if(!value){
+        return 'Nom requis !'
+      }
+      const regExpName = new RegExp('^[a-zA-Z-áàâäãåçéèêëíìîïñóòôöõú ùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ-]*$');
+      if(!regExpName.test(value)) {
+        return 'Nom invalide'
+      }
+
+      return true;
+    },
   }
 }
 </script>

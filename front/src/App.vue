@@ -6,24 +6,34 @@
       <router-link to="/signup">S'inscrire</router-link>
     </div>
     <div class="disconnect" v-if="this.$route.name === 'forum'">
-      <router-link to="/">Se déconnecter</router-link>
+      <a href @click.prevent="myProfile">Mon Profil</a>
+      <a href @click.prevent="logOut">Se déconnecter</a>
     </div>
   </nav>
   <router-view/>
 </template>
 
-<!--<script>
-  import NavLink from './components/NavLink.vue'
-  import Login from './components/Login.vue';
+<script>
+ /* import NavLink from './components/NavLink.vue'
+  import Login from './components/Login.vue';*/
 
   export default {
     name: 'App',
     components: {
-      NavLink,
-      Login
+      /*NavLink,
+      Login*/
+    },
+    methods: {
+      logOut() {
+        this.$store.dispatch('auth/logout');
+        this.$router.push('/');
+      },
+      myProfile() {
+        this.$router.push('/profile')
+      }
     }
   }
-</script>-->
+</script>
 
 <style lang="scss">
 body {

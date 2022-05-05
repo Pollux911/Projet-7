@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
 
     }
     toJSON() {
-      return { ...this.get(), email: undefined, password: undefined, isAdmin: undefined }
+      return { ...this.get(), /*email: undefined,*/ password: undefined, isAdmin: undefined }
     }
   }
   User.init({

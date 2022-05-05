@@ -1,7 +1,6 @@
 <template>
-  <form @submit="checkForm"
-        method="post"
-        novalidate="true">
+  <form @submit.prevent="checkForm"
+        novalidate>
     <div v-if="errors.length">
       <b>Veuillez corriger les erreurs suivantes:</b>
       <ul>
@@ -34,14 +33,26 @@ export default {
   data() {
     return {
       errors: [],
-      email: null,
-      password: null,
+      loading: false,
+      email: 'qwe@qwe.com',
+      password: 'qwe',
+      user: {}
+    };
+  },
+  computed: {
+    loggedIn() {
+      return this.$store.state.auth.status.loggedIn
+    }
+  },
+  created() {
+    if (this.loggedIn) {
+      this.$router.push('/forum')
     }
   },
   methods: {
-    checkForm(e){
+    checkForm(){
+      this.loading = true;
       const regExpEmail = new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
-
       this.errors = [];
 
       if(!this.email) {
@@ -56,27 +67,27 @@ export default {
         this.errors.push({message: 'Mot de passe requis'})
       }
 
-      else{
-        this.connect()
-      }
-      e.preventDefault()
-
-    },
-
-    async connect(){
-      const postConnect = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(),
-        headers: {
-          "content-type" : "application/json",
+      if(this.errors.length === 0) {
+        this.user = {
+          email: this.email,
+          password: this.password
         }
-      })
-
-      return postConnect
-
+        this.$store.dispatch('auth/login', this.user).then(
+            () => {
+              this.$router.push('/forum');
+            },
+            error => {
+              this.loading = false;
+              let errorMessage =
+                  (error.response && error.response.data) ||
+                  error.message ||
+                  error.toString();
+              this.errors.push({message: errorMessage.error});
+            }
+        );
+      }
     }
   }
-
 }
 </script>
 

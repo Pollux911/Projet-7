@@ -17,6 +17,13 @@ const commentRoutes = require('./routes/comment');
 const app = express();
 const bodyparser = require('body-parser');
 
+app.use((req, res, next) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        next();
+});
+
 const bcrypt = require("bcrypt");
 
 const limiter = rateLimit({
@@ -26,11 +33,6 @@ const limiter = rateLimit({
         legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-
-/*const sequelize = new Sequelize('groupomania', process.env.USER, process.env.PASSWORD, {
-    host: 'localhost',
-    dialect: 'mysql'
-});*/
 
 async function connect() {
     try {
@@ -61,12 +63,6 @@ app.use(express.json());
 app.use(bodyparser.json());
 
 
-app.use((req, res, next) => {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-        next();
-});
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 

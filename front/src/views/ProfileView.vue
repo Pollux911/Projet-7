@@ -1,25 +1,20 @@
 <template>
-  <div>
-    <HelloWorld msg="Accueil Forum"/>
-    <ForumPosts />
-  </div>
+  <HelloWorld msg="Profil"/>
+  <UserProfile />
 </template>
 
 <script>
 import HelloWorld from "@/components/HelloWorld";
-import ForumPosts from "@/components/ForumPosts";
-
+import UserProfile from "@/components/Profile";
 export default {
-  name: "ForumView",
+  name: "ProfileView",
   components: {
     HelloWorld,
-    ForumPosts
+    UserProfile
   }
 }
 </script>
 
 <style lang="scss">
-router-link{
 
-}
 </style>

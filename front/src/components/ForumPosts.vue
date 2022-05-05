@@ -14,7 +14,7 @@
   </ul>
 
   <p v-if="loading">
-    Loading...
+    Chargement...
   </p>
   <p v-if="error">
     Erreur avec l'API
@@ -36,7 +36,7 @@ export default {
     function fetchData() {
       loading.value = true;
       return fetch('http://localhost:3000/api/posts/', {
-        method: 'get',
+        method: 'GET',
         headers: {
           'content-type': 'application/json'
         }
