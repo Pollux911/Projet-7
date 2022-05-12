@@ -35,7 +35,7 @@ exports.getAllPosts = (req, res, next) => {
                 as:'postComment',
                 attributes:['firstName', 'lastName',],
                 through: {
-                    attributes: ['content']
+                    attributes: ['content', 'createdAt']
                 },
             }
         ]
@@ -67,29 +67,38 @@ exports.getOnePost = (req, res, next) => {
 
 
 exports.createPost = (req, res, next) => {
-    const { userId, ...postBody } = req.body;
-
-    User.findOne({where: { id: userId }})
+    //const { userId } = req.body;
+    //const postObject = JSON.parse(req.body.post)
+    const postObject = req.file ?
+        {
+            ...JSON.parse(req.body.post),
+            attachement: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        } :   JSON.parse(req.body.post) ;
+    console.log(postObject, 'allo')
+    User.findOne({where: { id: postObject.userId }})
         .then((user) => {
             if (!user) {
                 return res.status(404).json({
                     error: 'Utilisateur non trouvée !'
                 })
             }
-            console.log(user.id, 'ztdf')
+
             /*if (user.id !== req.auth.id) { //check auth token
                  return res.status(401).json({
                     error: 'Requête non autorisée !'
             })
             }*/
+            console.log(req.file, 'le fichier')
             Post.create({
-                ...postBody,
-                userId: user.id,
+                ...postObject,
+                attachement: `${req.protocol}://${req.get('host')}/images/${req.file.name}`,
+                userId: postObject.userId,
                 likes: 0 })
                 .then( () => res.status(201).json({ message: 'Post créé !'}))
                 .catch(error => res.status(400).json({ error }));
         })
         .catch( error => {
+            console.log(error, 'lerreur')
             res.status(500).json({ error })}
         )
 }
@@ -97,13 +106,12 @@ exports.createPost = (req, res, next) => {
 
 
 exports.modifyPost = (req, res, next) => {
-
     const postObject = req.file ?
         {
             ...JSON.parse(req.body.post),
             attachement: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         } : { ...req.body };
-    Post.update({uuid: req.params.uuid }, { ...postObject, uuid: req.params.uuid })
+    Post.update({id: req.params.id }, { ...postObject, id: req.params.id })
         .then(() => res.status(200).json({ message: 'Post modifiée !'}))
         .catch(error => res.status(400).json({ error }));
 };

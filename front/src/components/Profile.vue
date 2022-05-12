@@ -72,6 +72,10 @@ export default {
 
       return true;
     },
+    logOut() {
+      this.$store.dispatch('auth/logout');
+      this.$router.push('/');
+    },
     eraseUser(){
       this.user = {
         email: this.email,
@@ -81,8 +85,11 @@ export default {
       console.log('le token', this.currentUser.token)
       AuthService.deleteUser(this.user).then(
           data => {
-            this.message = data;
+            console.log(data)
+            this.message = data.data.message + " Redirection vers la page d'accueil...";
             this.successful = true;
+            AuthService.logout() //remove local storage user
+            setTimeout(() => this.logOut(), 2000 ) //redirect to home page after 2 seconds
           },
           error => {
             this.message =

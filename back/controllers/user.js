@@ -28,7 +28,7 @@ exports.signup = (req, res, next) => {
                         lastName: req.body.lastName,
                         password: hash
                     })
-                    .then(() => res.status(201).json({ message: 'Utilisateur cree !'}))
+                    .then(() => res.status(201).json({ message: 'Utilisateur créé !'}))
                     .catch(error => res.status(400).json({ error }));
                 })
                 .catch(error => res.status(500).json({ error }));
@@ -39,7 +39,7 @@ exports.login = (req, res, next) => {
     User.findOne({where: {email: req.body.email}})
         .then( user => {
             if (!user) {
-                return res.status(401).json({ error: 'Utilisateur non trouve !' });
+                return res.status(401).json({ error: 'Utilisateur non trouvé !' });
             }
             bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
@@ -68,7 +68,7 @@ exports.deleteUser = (req, res, next) => {
         .then( user => {
             if(!user) {
                 return res.status(404).json({
-                    error: 'Utilisateur non trouvée !'
+                    error: 'Utilisateur non trouvé !'
                 })
             }
             /*if (user.uuid !== req.auth.userId || req.auth.admin === true) { // check auth or user is an Admin
@@ -76,7 +76,7 @@ exports.deleteUser = (req, res, next) => {
                     error: 'Requête non autorisée !'})
             }*/
             User.destroy({where: { email: req.body.email }})
-                .then(() => res.status(200).json({ message: 'Utilisateur supprimée !' }))
+                .then(() => res.status(200).json({ message: 'Utilisateur supprimé !' }))
                 .catch(error => res.status(400).json({ error }));
         })
         .catch(error => res.status(500).json({ error }))

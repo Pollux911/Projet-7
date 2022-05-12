@@ -1,10 +1,5 @@
 <template>
   <Form @submit="handleSignup">
-      <div v-if="errors.length">
-        <b>Veuillez corriger les erreurs suivantes:</b>
-      <ul>
-        <li v-for="error in errors" :key="error.message">{{ error.message }}</li>
-      </ul></div>
     <div class="signup">
       <div class="signup__email">
         <label for="email">Email : </label>
@@ -46,7 +41,6 @@ export default {
   },
   data() {
     return {
-      errors: [],
       email: null,
       password: null,
       firstName: null,

@@ -3,6 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import SignupView from "@/views/SignupView";
 import ForumView from "@/views/ForumView";
 import ProfileView from "@/views/ProfileView";
+import CreatePostView from "@/views/CreatePostView";
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: ProfileView
+  },
+  {
+    path: '/createpost',
+    name: 'createpost',
+    component: CreatePostView
   }
   /*{
     path: '/about',
@@ -48,7 +54,7 @@ router.beforeEach((to, from, next) => {
   // trying to access a restricted page + not logged in
   // redirect to login page
   if (authRequired && !loggedIn) {
-    next('/login');
+    next('/');
   } else {
     next();
   }

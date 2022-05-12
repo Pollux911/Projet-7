@@ -38,7 +38,9 @@ module.exports = (sequelize, DataTypes) => {
       references: {
         model: 'Users',
         key: 'id',
-      }
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
     },
     postId: {
       allowNull: false,
@@ -47,6 +49,8 @@ module.exports = (sequelize, DataTypes) => {
         model: 'Posts',
         key: 'id',
       },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
     },
     content: {
       allowNull: false,

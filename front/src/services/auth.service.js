@@ -27,7 +27,6 @@ class AuthService {
         })
     }
     deleteUser(user){
-        console.log(user, 'le user')
         return axios.delete( API_URL +'deleteUser', {
             headers: authHeader(),
             data: {

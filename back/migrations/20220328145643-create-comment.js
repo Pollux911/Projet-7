@@ -14,7 +14,9 @@ module.exports = {
         references: {
           model: 'Users',
           key: 'id',
-        }
+        },
+        onUpdate: 'cascade',
+        onDelete: 'cascade'
       },
       postId: {
         allowNull: false,
@@ -23,6 +25,8 @@ module.exports = {
           model: 'Posts',
           key: 'id',
         },
+        onUpdate: 'cascade',
+        onDelete: 'cascade'
       },
       content: {
         allowNull: false,

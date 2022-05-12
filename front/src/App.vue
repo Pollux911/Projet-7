@@ -6,7 +6,8 @@
       <router-link to="/signup">S'inscrire</router-link>
     </div>
     <div class="disconnect" v-if="this.$route.name === 'forum'">
-      <a href @click.prevent="myProfile">Mon Profil</a>
+      <router-link to="/createpost">Créer un post</router-link> |
+      <router-link to="/profile">Mon Profil</router-link> |
       <a href @click.prevent="logOut">Se déconnecter</a>
     </div>
   </nav>
@@ -27,9 +28,6 @@
       logOut() {
         this.$store.dispatch('auth/logout');
         this.$router.push('/');
-      },
-      myProfile() {
-        this.$router.push('/profile')
       }
     }
   }
@@ -45,6 +43,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #929292;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .logo{
   filter: invert(13%) sepia(95%) saturate(6682%) hue-rotate(6deg) brightness(105%) contrast(119%);

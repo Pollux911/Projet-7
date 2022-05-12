@@ -41,7 +41,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      allowNull: false
+      allowNull: false,
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
     },
     email: {
       allowNull: false,
