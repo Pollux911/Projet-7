@@ -25,18 +25,29 @@ exports.getAllPosts = (req, res, next) => {
             {
                 model: User,
                 as: 'postLike',
-                attributes: ['firstName', 'lastName'],
+                attributes: ['firstName', 'lastName', 'id' ],
                 through: {
                     attributes: ['like']
                 },
             },
-            {
+            /*{
                 model:User,
                 as:'postComment',
                 attributes:['firstName', 'lastName',],
                 through: {
                     attributes: ['content', 'createdAt']
                 },
+            },*/
+            {
+                model: Comment,
+                as: 'postComments',
+                attributes: ['content', 'createdAt'],
+                include: {
+                    model: User,
+                    as:'commentUser',
+                    attributes: ['firstName', 'lastName']
+                },
+
             }
         ]
 
@@ -50,13 +61,30 @@ exports.getAllPosts = (req, res, next) => {
 
 exports.getOnePost = (req, res, next) => {
     Post.findOne({where: { id: req.params.id},
-        include: {
-        model: User,
-        as:'postLike',
-        attributes: ['firstName', 'lastName'],
-        through: {
-            attributes: ['like']
-        }}
+        include: [
+            {
+                model: User,
+                as:'postLike',
+                attributes: ['firstName', 'lastName'],
+                through: {
+                    attributes: ['like']
+            }
+        },
+            {
+                model: User,
+                as:'postComment',
+                attributes:['firstName', 'lastName'],
+                through: {
+                    attributes: [/*'content', 'createdAt'*/]
+                }
+            },
+            {
+                model: Comment,
+                as: 'postComments'
+            }
+
+
+        ]
     })
         .then(post => res.status(200).json(post))
         .catch(error => {
@@ -67,14 +95,15 @@ exports.getOnePost = (req, res, next) => {
 
 
 exports.createPost = (req, res, next) => {
-    //const { userId } = req.body;
-    //const postObject = JSON.parse(req.body.post)
     const postObject = req.file ?
         {
             ...JSON.parse(req.body.post),
-            attachement: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+            attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         } :   JSON.parse(req.body.post) ;
     console.log(postObject, 'allo')
+    console.log(req.body.attachment, 'requete')
+
+    console.log(req.file, 'lattachment backend')
     User.findOne({where: { id: postObject.userId }})
         .then((user) => {
             if (!user) {
@@ -91,9 +120,10 @@ exports.createPost = (req, res, next) => {
             console.log(req.file, 'le fichier')
             Post.create({
                 ...postObject,
-                attachement: `${req.protocol}://${req.get('host')}/images/${req.file.name}`,
+                /*attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,*/
                 userId: postObject.userId,
-                likes: 0 })
+                likes: 0
+            })
                 .then( () => res.status(201).json({ message: 'Post créé !'}))
                 .catch(error => res.status(400).json({ error }));
         })
@@ -109,7 +139,7 @@ exports.modifyPost = (req, res, next) => {
     const postObject = req.file ?
         {
             ...JSON.parse(req.body.post),
-            attachement: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+            attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         } : { ...req.body };
     Post.update({id: req.params.id }, { ...postObject, id: req.params.id })
         .then(() => res.status(200).json({ message: 'Post modifiée !'}))
@@ -119,6 +149,7 @@ exports.modifyPost = (req, res, next) => {
 exports.deletePost = (req, res, next) => {
     Post.findOne( {where: { id: req.params.id}})
         .then((post) => {
+
             if(!post) {
                 return res.status(404).json({
                     error: 'Post non trouvée !'
@@ -128,9 +159,12 @@ exports.deletePost = (req, res, next) => {
             return res.status(401).json({
                 error: 'Requête non autorisée !'})
             }*/
+            const filename = post.attachment.split('/images/')[1];
+            fs.unlink(`images/${filename}`, () =>
             Post.destroy({where: { id: req.params.id }})
                 .then(() => res.status(200).json({ message: 'Post supprimée !' }))
-                .catch(error => res.status(400).json({ error }));
+                .catch(error => res.status(400).json({ error }))
+            )
         })
         .catch( error => res.status(500).json({ error }))
 }
@@ -141,7 +175,7 @@ exports.deletePost = (req, res, next) => {
 /*exports.deletePost = (req, res, next) => {
     Post.findOne( {where: { uuid: req.params.id}})
         .then(post => {
-            const filename = post.attachement.split('/images/')[1];
+            const filename = post.attachment.split('/images/')[1];
             fs.unlink(`images/${filename}`, () => {
                 Post.findOne({where: { uuid: req.params.id}}).then(
                     (post) => {

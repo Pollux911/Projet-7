@@ -46,6 +46,7 @@ export default {
       lastName: null,
       message: '',
       successful: false,
+
     }
   },
   computed: {

@@ -12,10 +12,10 @@
         <textarea name="content" id="content" v-model="content" placeholder="Contenu du post..." />
         <ErrorMessage name="content" />
       </div>
-      <div class="post__attachement">
+      <div class="post__image">
         <label for="text">Lien : </label>
-        <Field type="text" name="attachement" id="attachement" v-model="attachement"  placeholder="Lien" />
-        <ErrorMessage name="attachement" />
+        <Field type="file" name="image" id="image" v-model="image"  placeholder="Lien" />
+        <ErrorMessage name="image" />
       </div>
       <div class="dropzone">
         <DropZone class="drop-area" @files-dropped="addFiles" #default="{ dropZoneActive }">
@@ -53,7 +53,7 @@ import DropZone from "@/components/DropZone";
 import FilePreview from "@/components/FilePreview";
 import useFileList from '../store/file-list.js'
 import axios from "axios";
-import {uploadFiles} from "@/store/file-uploader";
+//import {uploadFiles} from "@/store/file-uploader";
 //import createUploader from "@/store/file-uploader";
 
 
@@ -83,15 +83,15 @@ export default {
       post: null,
       title: null,
       content: null,
-      attachement: null,
-      FILE: null,
+      image: null,
+      /*file: null,*/
       submitted: false,
       successful: false,
       message: ''
     }
   },
   methods : {
-    sendForm(files) {
+    sendForm() {
       this.message = '';
       let user = JSON.parse(localStorage.user).userId
       this.post = {
@@ -99,22 +99,33 @@ export default {
         content: this.content,
         userId: user
       }
+      /*this.file = {
+        attachment: this.attachment
+      }*/
       console.log(this.post, 'le post')
+      console.log(this.image, 'le ficher front')
       const formData = new FormData()
-      uploadFiles(files);
-      console.log(formData, ' 12345645646')
+      //uploadFiles(files);
 
-      //formData.append('attachement', this.FILE)
-
+      //formData.append('attachment', file, this.FILE)
       formData.append('post', JSON.stringify(this.post))
+      formData.append('image', this.image[0], this.image[0].name)
+      for (let value of formData.values()) {
+        console.log(value, 'fgdsgdfsgfsdgfsd');
+      }
 
-      axios.post('http://localhost:3000/api/posts', formData)
+
+      axios.post('http://localhost:3000/api/posts',
+        formData
+      )
           .then(data => {
-                this.message = data;
+                console.log(data, 'les datas')
+                this.message = data.data.message;
                 this.successful = true;
                 setTimeout( () => this.$router.push('/forum'), 3000)
               },
               error => {
+                console.log(error, 'erreurfrontend')
                 this.message =
                     (error.response && error.response.data) ||
                     error.message ||
@@ -171,5 +182,10 @@ label {
   flex-wrap: wrap;
   padding: 0;
 }
+form {
+  max-width: 25em;
+  margin: auto;
+}
+
 
 </style>

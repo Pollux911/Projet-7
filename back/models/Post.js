@@ -25,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
         through: models.Comment,
         /*sourceKey: 'id', targetKey: 'id'*/
       });
+      Post.hasMany(models.Comment, {
+        foreignKey: 'postId', as: 'postComments'
+      })
 
     }
     /*toJSON(){
@@ -50,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING
     },
-    attachement: {
+    attachment: {
       allowNull: true,
       type: DataTypes.STRING
     },

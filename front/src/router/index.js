@@ -4,6 +4,7 @@ import SignupView from "@/views/SignupView";
 import ForumView from "@/views/ForumView";
 import ProfileView from "@/views/ProfileView";
 import CreatePostView from "@/views/CreatePostView";
+import ModifyPost from "@/components/ModifyPost";
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/createpost',
     name: 'createpost',
     component: CreatePostView
+  },
+  {
+    path: '/modifypost/:id',
+    name: 'modifypost',
+    component: ModifyPost
   }
   /*{
     path: '/about',

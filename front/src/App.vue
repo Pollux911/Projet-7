@@ -7,7 +7,7 @@
     </div>
     <div class="disconnect" v-if="this.$route.name === 'forum'">
       <router-link to="/createpost">Créer un post</router-link> |
-      <router-link to="/profile">Mon Profil</router-link> |
+      <router-link to="/profile/">Mon Profil</router-link> |
       <a href @click.prevent="logOut">Se déconnecter</a>
     </div>
   </nav>

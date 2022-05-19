@@ -2,14 +2,14 @@
 
 export async function uploadFile(file/*, url*/) {
     let formData = new FormData()
-    formData.append('attachement', file.file)
+    formData.append('attachment', file.file)
 
     /*file.status = 'loading'
     let response = await fetch(url, { method: 'POST', body: formData }) //add headers
 
     file.status = response.ok*/
     for (let value of formData.values()) {
-        console.log(value);
+        console.log(value, 'le fichier');
     }
     return formData
 }
