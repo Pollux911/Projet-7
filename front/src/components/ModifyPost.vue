@@ -3,7 +3,7 @@
     <div class="post">
       <div class="post__title">
         <label for="title">Titre :</label>
-        <Field type="text" name="title" id="title" v-model="title" placeholder="Titre" required />
+        <Field type="text" name="title" id="title" v-model="title" placeholder="" required />
         <ErrorMessage name="title" />
       </div>
 
@@ -14,7 +14,8 @@
       </div>
       <div class="post__image">
         <label for="text">Lien : </label>
-        <Field type="file" name="image" id="image" v-model="image" value=""  placeholder="Lien" />
+        <Field type="file" name="image" id="image" v-model="image"  placeholder="Lien" />
+        <img :src="image" alt="Image">
         <ErrorMessage name="image" />
       </div>
 
@@ -40,10 +41,14 @@ export default {
     ErrorMessage,
   },
   setup() {
-    const data = ref(null);
-    const error = ref(null);
-    const route = useRoute();
-    const id = route.params.id
+    const data = ref(null),
+          error = ref(null),
+          route = useRoute(),
+          id = route.params.id,
+          title= ref(null),
+          content= ref(null),
+          image= ref(null)
+
 
     function fetchPost(postId) {
       return fetch(`http://localhost:3000/api/posts/${postId}`, {
@@ -64,10 +69,10 @@ export default {
           .then(json => {
             data.value = json;
             console.log(json.title)
-            console.log(this.content)
-            this.content = json.title
-
-
+            title.value = json.title
+            content.value = json.content
+            image.value = json.attachment
+            console.log(json.attachment, 'limagezxzz')
 
           })
           .catch(err => {
@@ -92,22 +97,23 @@ export default {
 
     return {
       data,
-      error
+      error,
+      id,
+      title,
+      content,
+      image
+
     };
   },
   data() {
 
     return {
       post: null,
-      title: null,
-      content: null,
-      image: null,
       submitted: false,
       successful: false,
-      message: '',
+      message: ''
     }
   },
-
   methods : {
 
     sendForm() {
@@ -124,15 +130,18 @@ export default {
       const formData = new FormData()
 
       formData.append('post', JSON.stringify(this.post))
-      formData.append('image', this.image[0], this.image[0].name)
+      console.log(this.image, 'limagge')
+      if(this.image) {
+        formData.append('image', this.image[0], this.image[0].name)
+      }
 
 
       axios.put(`http://localhost:3000/api/posts/${this.$route.params.id}`, formData)
           .then(data => {
                 console.log(data, 'les datas')
-                this.message = data.data.message;
+                this.message = data.data.message + " Redirection...";
                 this.successful = true;
-                //setTimeout( () => this.$router.push('/forum'), 3000)
+                setTimeout( () => this.$router.push('/forum'), 3000)
               },
               error => {
                 console.log(error, 'erreurfrontend')

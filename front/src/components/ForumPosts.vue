@@ -2,19 +2,25 @@
   <ul v-if="!loading && data && data.length">
     <li v-for="post of data" :key="post">
 
-      <router-link :to="`/modifypost/${post.id}`">Modifier post</router-link>
+      <div v-if=" user === post.users.id">
+        <router-link :to="`/modifypost/${post.id}`">Modifier le post</router-link>
+      </div>
+
 
       <h2>{{ post.title }}</h2>
       <p class="date"> {{ post.createdAt.substring(11, 16) }} le {{ post.createdAt.substring(5, 7) }}/{{ post.createdAt.substring(8, 10) }}</p>
       <p class="post">{{ post.users.firstName + ' ' + post.users.lastName }} a posté : {{ post.content }}</p>
 
-      <p class="likes">{{ post.likes }} likes</p>
       <img :src="post.attachment" alt="Image">
-      <LikeButton :postId="post.id"  :liked="post.postLike"/>
+      <p class="likes">{{ post.likes }} likes</p>
+      <LikeButton :postId="post.id"  :liked="post.postLike" @like-clicked="updateLike(post.id, post.likes)"/>
 
-      <p class="comments" v-for="comment of post.postComments" :key="comment">
-        {{  comment.commentUser.firstName + ' ' + comment.commentUser.lastName }} a commenté à {{ comment.createdAt.substring(11, 16) }} le {{ comment.createdAt.substring(5, 7) }}/{{ comment.createdAt.substring(8, 10) }} : {{ comment.content }}
-      </p>
+      <div class="comments" v-for="comment of post.postComments" :key="comment">
+        <p>
+          {{  comment.commentUser.firstName + ' ' + comment.commentUser.lastName }} a commenté à {{ comment.createdAt.substring(11, 16) }} le {{ comment.createdAt.substring(5, 7) }}/{{ comment.createdAt.substring(8, 10) }} : {{ comment.content }}
+        </p>
+        <button v-if=" user === comment.commentUser.id ">Modifier commentaire</button>
+      </div>
       <CommentButton :postId="post.id" />
 
     </li>
@@ -33,6 +39,7 @@
 import {ref, onMounted} from "vue";
 import LikeButton from "@/components/LikeButton";
 import CommentButton from "@/components/CommentButton";
+import axios from "axios";
 
 export default {
   name: 'ForumPosts',
@@ -44,6 +51,7 @@ export default {
     const data = ref(null);
     const loading = ref(true);
     const error = ref(null);
+    const user = ref(JSON.parse(localStorage.user).userId)
 
     function fetchData() {
 
@@ -93,6 +101,23 @@ export default {
       array.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
     }
 
+    function updateLike(postId){
+      axios.get(`http://localhost:3000/api/posts/${postId}`)
+          .then( json => {
+            console.log(json.data.likes, ' tessst')
+            let dataLikes = data.value.find(e => e.id = postId).likes
+
+            console.log(dataLikes, ' 1 ')
+            dataLikes = json.data.likes
+            console.log(dataLikes, '2')
+
+            //this.post.likes.value = json.data.likes
+
+          })
+      console.log(postId, 'updated like')
+
+    }
+
 
 
     onMounted(() => {
@@ -103,6 +128,9 @@ export default {
       data,
       loading,
       error,
+      user,
+      fetchData,
+      updateLike
       //userName
     };
   }

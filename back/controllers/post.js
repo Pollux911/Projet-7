@@ -19,7 +19,7 @@ exports.getAllPosts = (req, res, next) => {
             {
                 model: User,
                 as: 'users',
-                attributes: ['firstName', 'lastName']
+                attributes: ['firstName', 'lastName', 'id']
             },
 
             {
@@ -45,7 +45,7 @@ exports.getAllPosts = (req, res, next) => {
                 include: {
                     model: User,
                     as:'commentUser',
-                    attributes: ['firstName', 'lastName']
+                    attributes: ['firstName', 'lastName', 'id']
                 },
 
             }
@@ -120,7 +120,7 @@ exports.createPost = (req, res, next) => {
             console.log(req.file, 'le fichier')
             Post.create({
                 ...postObject,
-                /*attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,*/
+                attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
                 userId: postObject.userId,
                 likes: 0
             })
@@ -140,10 +140,18 @@ exports.modifyPost = (req, res, next) => {
         {
             ...JSON.parse(req.body.post),
             attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        } : { ...req.body };
-    Post.update({id: req.params.id }, { ...postObject, id: req.params.id })
-        .then(() => res.status(200).json({ message: 'Post modifiée !'}))
-        .catch(error => res.status(400).json({ error }));
+        } : JSON.parse(req.body.post);
+    Post.update({ ...postObject}, {where: { id: req.params.id }})
+        .then(() => {
+            console.log(postObject, 'lobject modif')
+
+            res.status(200).json({ message: 'Post modifiée !'})
+        })
+
+        .catch(error => {
+            console.log(error, 'lerreur')
+            res.status(400).json({ error });
+        })
 };
 
 exports.deletePost = (req, res, next) => {

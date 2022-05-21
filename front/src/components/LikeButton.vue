@@ -19,16 +19,14 @@ export default {
         return axios.post(`http://localhost:3000/api/posts/${postUuid}/like`, {
           like:false,
           userId: JSON.parse(localStorage.user).userId
-        })
+        }).then(() => this.$emit('like-clicked'))
       }
       else {
-        axios.post(`http://localhost:3000/api/posts/${postUuid}/like`, {
+        return axios.post(`http://localhost:3000/api/posts/${postUuid}/like`, {
           like:true,
           userId: JSON.parse(localStorage.user).userId
-        })
+        }).then(() => this.$emit('like-clicked'))
       }
-
-
 
 
     }
