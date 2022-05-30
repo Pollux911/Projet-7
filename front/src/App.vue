@@ -23,14 +23,10 @@
 </template>
 
 <script>
- /* import NavLink from './components/NavLink.vue'
-  import Login from './components/Login.vue';*/
 
   export default {
     name: 'App',
     components: {
-      /*NavLink,
-      Login*/
     },
     methods: {
       logOut() {

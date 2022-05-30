@@ -68,7 +68,8 @@ exports.deleteUser = (req, res, next) => {
                     error: 'Utilisateur non trouvé !'
                 })
             }
-            if (user.uuid !== req.auth.userId || req.auth.admin === true) { // check auth or user is an Admin
+            if (user.id !== req.auth.userId && user.isAdmin !== true) { // check auth or user is an Admin
+                console.log(user.isAdmin, 'userIDDDD')
                 return res.status(401).json({
                     error: 'Requête non autorisée !'})
             }

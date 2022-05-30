@@ -38,10 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.UUID,
       primaryKey: true,
-      /*references: {
-        model: 'Posts',
-        key: 'id',
-      },*/
       onUpdate: 'cascade',
       onDelete: 'cascade'
     },

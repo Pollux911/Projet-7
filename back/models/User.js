@@ -11,13 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      //User.belongsToMany(Post, { /*as: 'userlike',*/ through: 'UserPost', sourceKey: User.uuid, targetKey: Post.uuid })
       User.hasMany(models.Post, {
         foreignKey: 'userId', as: 'posts'
       });
-      /*User.hasMany(models.Comment, {
-
-      })*/
       User.belongsToMany(models.Post, {
         as:'userLike',
         through: models.Like,

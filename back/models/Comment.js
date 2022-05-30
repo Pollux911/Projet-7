@@ -21,7 +21,6 @@ module.exports = (sequelize, DataTypes) => {
         as: 'commentLike',
         through: models.Like,
         foreignKey: 'postId'
-        //sourceKey: 'id', targetKey: 'id'
       });
     }
   }

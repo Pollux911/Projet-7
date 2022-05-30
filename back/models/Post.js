@@ -30,14 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       })
 
     }
-    /*toJSON(){
-      return { ...this.get() }
-    }*/
   }
-  /*Post.associate = function (models) {
-
-
-  };*/
   Post.init({
     id: {
       type: DataTypes.UUID,

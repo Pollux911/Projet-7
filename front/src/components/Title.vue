@@ -17,8 +17,6 @@ export default {
 
 <style lang="scss">
 #intro {
-  /*display: flex;
-  align-content: flex-start;*/
 }
 a, h1{
   color: red;
