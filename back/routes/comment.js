@@ -6,11 +6,7 @@ const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 
-router.get('/' , /*auth,*/ commentCtrl.getAllComments);
-router.get('/:id', /*auth,*/ commentCtrl.getOneComment);
-router.post('/:id', /*auth,*/  commentCtrl.createComment);
-router.put('/:id', /*auth,*/  commentCtrl.modifyComment);
-router.delete('/:id', /*auth,*/ commentCtrl.deleteComment);
-router.post('/:id/like', /*auth,*/ commentCtrl.likeComment);
+router.post('/:id', auth,  commentCtrl.createComment);
+router.delete('/:id', auth, commentCtrl.deleteComment);
 
 module.exports = router;

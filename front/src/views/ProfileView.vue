@@ -1,15 +1,15 @@
 <template>
-  <HelloWorld msg="Profil"/>
+  <Title msg="Profil"/>
   <UserProfile />
 </template>
 
 <script>
-import HelloWorld from "@/components/HelloWorld";
+import Title from "@/components/Title";
 import UserProfile from "@/components/Profile";
 export default {
   name: "ProfileView",
   components: {
-    HelloWorld,
+    Title,
     UserProfile
   }
 }

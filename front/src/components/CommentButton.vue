@@ -21,15 +21,16 @@ export default {
   },
   methods: {
     commentPost() {
-      let postUuid = this.postId;
+      let postId = this.postId;
+      let userStorage = JSON.parse(localStorage.getItem('user'))
       if (!this.contentArea) {
         return alert('Votre commentaire est vide.')
       }
-      return axios.post(`http://localhost:3000/api/comments/${postUuid}`, {
+      return axios.post(`http://localhost:3000/api/comments/${postId}`, {
         userId: JSON.parse(localStorage.user).userId,
         content: this.contentArea,
         likes: 0
-      })
+      }, {headers: {'Authorization': 'Bearer ' + userStorage.token}}).then(() => this.$emit('comment-clicked'), this.contentArea = null)
     }
   }
 

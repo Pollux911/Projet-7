@@ -9,7 +9,6 @@ const schema = Joi.object({
 module.exports = (req, res, next) => {
 
     try {
-        console.log(req.body);
         const validateReturn = schema.validate(req.body);
         if (validateReturn.error) {
 

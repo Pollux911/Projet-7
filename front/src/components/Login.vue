@@ -15,7 +15,7 @@
       </div>
       <div class="login__password">
         <label for="password">Mot de passe: </label>
-        <input type="password" name="password" id="password" v-model="password" required>
+        <input type="password" name="password" id="password" placeholder="MotDePasse" v-model="password" required>
         <p id="passwordErrorMsg"></p>
       </div>
       <div class="form__submit">
@@ -34,8 +34,8 @@ export default {
     return {
       errors: [],
       loading: false,
-      email: 'qwe@qwe.com',
-      password: 'qwe',
+      email: null,
+      password: null,
       user: {}
     };
   },

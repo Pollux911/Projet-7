@@ -1,6 +1,6 @@
 {
   "development": {
-    "username": "newuser",
+    "username": "root",
     "password": "asd123",
     "database": "groupomania",
     "host": "127.0.0.1",

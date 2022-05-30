@@ -1,18 +1,18 @@
 <template>
-  <HelloWorld msg="Créer un post"/>
+  <Title msg="Créer un post"/>
   <CreatePost />
 </template>
 
 <script>
 
 import CreatePost from "@/components/CreatePost";
-import HelloWorld from "@/components/HelloWorld";
+import Title from "@/components/Title";
 
 export default {
   name: "CreatePostView",
   components: {
     CreatePost,
-    HelloWorld
+    Title
   }
 }
 </script>
