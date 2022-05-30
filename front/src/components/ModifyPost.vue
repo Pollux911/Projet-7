@@ -13,7 +13,7 @@
         <ErrorMessage name="content" />
       </div>
       <div class="post__image">
-        <label for="text">Lien : </label>
+        <label for="image">Lien : </label>
         <Field type="file" name="image" id="image" v-model="image"  placeholder="Lien" />
         <img :src="image" alt="Image">
         <ErrorMessage name="image" />
@@ -47,13 +47,15 @@ export default {
           id = route.params.id,
           title= ref(null),
           content= ref(null),
-          image= ref(null)
+          image= ref(null),
+          userStorage = ref(JSON.parse(localStorage.getItem('user')))
 
 
     function fetchPost(postId) {
       return fetch(`http://localhost:3000/api/posts/${postId}`, {
         method: 'GET',
         headers: {
+          'Authorization': 'Bearer ' + userStorage.value.token,
           'content-type': 'application/json'
         }
       })
@@ -68,12 +70,9 @@ export default {
           })
           .then(json => {
             data.value = json;
-            console.log(json.title)
             title.value = json.title
             content.value = json.content
             image.value = json.attachment
-            console.log(json.attachment, 'limagezxzz')
-
           })
           .catch(err => {
             error.value = err;
@@ -101,8 +100,8 @@ export default {
       id,
       title,
       content,
-      image
-
+      image,
+      userStorage
     };
   },
   data() {
@@ -119,8 +118,8 @@ export default {
     sendForm() {
       this.message = '';
 
-
       let user = JSON.parse(localStorage.user).userId
+      let token = JSON.parse(localStorage.user).token
       this.post = {
         title: this.title,
         content: this.content,
@@ -130,21 +129,20 @@ export default {
       const formData = new FormData()
 
       formData.append('post', JSON.stringify(this.post))
-      console.log(this.image, 'limagge')
       if(this.image) {
         formData.append('image', this.image[0], this.image[0].name)
       }
 
 
-      axios.put(`http://localhost:3000/api/posts/${this.$route.params.id}`, formData)
+      axios.put(`http://localhost:3000/api/posts/${this.$route.params.id}`, formData, {
+        headers: {'Authorization': 'Bearer ' + token}
+      })
           .then(data => {
-                console.log(data, 'les datas')
                 this.message = data.data.message + " Redirection...";
                 this.successful = true;
                 setTimeout( () => this.$router.push('/forum'), 3000)
               },
               error => {
-                console.log(error, 'erreurfrontend')
                 this.message =
                     (error.response && error.response.data) ||
                     error.message ||

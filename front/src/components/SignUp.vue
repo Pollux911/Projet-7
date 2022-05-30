@@ -12,12 +12,12 @@
         <ErrorMessage name="password" />
       </div>
       <div class="signup__lastName">
-        <label for="text">Nom : </label>
+        <label for="lastName">Nom : </label>
         <Field type="text" name="lastName" id="lastName" v-model="lastName" :rules="validateLastName" placeholder="Nom" required />
         <ErrorMessage name="lastName" />
       </div>
       <div class="signup__firstName">
-        <label for="text">Prénom : </label>
+        <label for="firstName">Prénom : </label>
         <Field type="text" name="firstName" id="firstName" v-model="firstName" :rules="validateFirstName" placeholder="Prénom" required />
         <ErrorMessage name="firstName" />
       </div>
@@ -103,6 +103,12 @@ export default {
     validatePassword(value) {
       if(!value){
         return 'Mot de passe requis !'
+      }
+      if(value.length < 8) {
+        return 'Le mot de passe doit contenir au moins 8 caractères'
+      }
+      if(value.length > 64) {
+        return 'Le mot de passe doit contenir au maximun 64 caractères'
       }
 
       return true;

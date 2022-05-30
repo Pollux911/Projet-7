@@ -5,10 +5,18 @@
       <router-link to="/">Se connecter</router-link> |
       <router-link to="/signup">S'inscrire</router-link>
     </div>
-    <div class="disconnect" v-if="this.$route.name === 'forum'">
+    <div class="navLinks" v-if="this.$route.name === 'forum'">
       <router-link to="/createpost">Créer un post</router-link> |
       <router-link to="/profile/">Mon Profil</router-link> |
       <a href @click.prevent="logOut">Se déconnecter</a>
+    </div>
+    <div class="navLinks" v-if="this.$route.name === 'createpost'">
+      <router-link to="/forum/">Forum</router-link> |
+      <router-link to="/profile/">Mon Profil</router-link>
+    </div>
+    <div class="navLinks" v-if="this.$route.name === 'profile'">
+      <router-link to="/forum/">Forum</router-link> |
+      <router-link to="/createpost/">Créer un post</router-link>
     </div>
   </nav>
   <router-view/>
@@ -34,15 +42,16 @@
 </script>
 
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap');
 body {
-  background-color: #101010;
+  background-color: white;
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Lato, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #929292;
+  color: #4E5166;
   margin: 0 auto;
   height: 100%;
   display: flex;
@@ -64,5 +73,12 @@ nav {
 nav a.router-link-exact-active, nav a:visited {
   color: red;
   text-decoration: none;
+}
+
+.navLinks{
+  flex-direction: row;
+}
+router-link a {
+
 }
 </style>

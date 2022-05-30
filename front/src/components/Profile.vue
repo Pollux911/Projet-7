@@ -11,11 +11,8 @@
       <strong>Id:</strong>
       {{currentUser.userId}}
     </p>
-    <strong>Rôle:</strong>
-    <ul>
-<!--      <li v-for="(role,index) in currentUser.roles" :key="index">{{role}}</li>-->
-    </ul>
     <Form @submit="eraseUser">
+      <p>Entrez votre email pour effacer votre compte :</p>
       <label for="email">Email : </label>
       <Field type="email" name="email" id="email" v-model="email" :rules="validateEmail" />
       <ErrorMessage name="email" />
@@ -44,6 +41,7 @@ export default {
       email: null,
       firstName: null,
       lastName: null,
+      isAdmin: null,
       message: '',
       successful: false,
 
@@ -51,7 +49,6 @@ export default {
   },
   computed: {
     currentUser() {
-      console.log(this.$store.state.auth.user, 'userrweerw')
       return this.$store.state.auth.user;
     }
   },
@@ -82,11 +79,8 @@ export default {
         email: this.email,
         token: this.currentUser.token
       }
-      console.log('deleting')
-      console.log('le token', this.currentUser.token)
       AuthService.deleteUser(this.user).then(
           data => {
-            console.log(data)
             this.message = data.data.message + " Redirection vers la page d'accueil...";
             this.successful = true;
             AuthService.logout() //remove local storage user
